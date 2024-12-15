@@ -39,9 +39,11 @@ public class Upload_B {
 
             int maxPrice = getItemPrice(priceChoice);
             int itemID = getItemID(itemName, maxPrice);
+            System.out.println("테스트 : itemID : "+itemID);
             int userId = getUserId(currentUser);
 
             // 대여 요청 등록
+            System.out.println("registerBorrowRequest 호출: itemId=" + itemID + ", maxPrice=" + maxPrice + ", userId=" + userId);
             registerBorrowRequest(itemID, maxPrice, userId);
 
             System.out.println("대여 요청이 성공적으로 등록되었습니다.");
@@ -51,8 +53,11 @@ public class Upload_B {
     }
 
     private void registerBorrowRequest(int itemId, int maxPrice, int borrowerId) throws SQLException {
-        String insertBorrowRequestSql = "INSERT INTO BorrowedItems (item_fk, user_fk, max_price, message) VALUES (?, ?, ?, ?)";
+        if (itemId <= 0 || borrowerId <= 0 || maxPrice <= 0) {
+            throw new SQLException("유효하지 않은 데이터: itemId=" + itemId + ", borrowerId=" + borrowerId + ", maxPrice=" + maxPrice);
+        }
 
+        String insertBorrowRequestSql = "INSERT INTO BorrowedItems (item_fk, user_fk, max_price, message) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(insertBorrowRequestSql)) {
             pstmt.setInt(1, itemId);
             pstmt.setInt(2, borrowerId);
@@ -60,9 +65,10 @@ public class Upload_B {
             pstmt.setString(4, "새로운 대여 요청");
             pstmt.executeUpdate();
 
-            System.out.println("대여 요청이 등록되었습니다.");
+            System.out.println("대여 요청 등록 완료: item_fk=" + itemId + ", user_fk=" + borrowerId + ", max_price=" + maxPrice);
         }
     }
+
 
     private String getItemName(int choice) {
         switch (choice) {
@@ -87,7 +93,6 @@ public class Upload_B {
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, itemName);
             pstmt.setInt(2, price);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("item_pk");

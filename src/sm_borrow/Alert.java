@@ -141,7 +141,6 @@ package sm_borrow;
 //}
 
 
-
 import java.sql.*;
 import java.util.Scanner;
 
@@ -189,7 +188,7 @@ public class Alert {
     }
 
     private void displayAlerts() throws SQLException {
-        String query = "SELECT a.user_L_id, i.item_name, u.username AS borrower_name, a.status, a.created_at " +
+        String query = "SELECT a.alert_pk, i.item_name, u.username AS borrower_name, a.status, a.created_at " +
                        "FROM Alerts a " +
                        "JOIN Items i ON a.item_fk = i.item_pk " +
                        "JOIN Users u ON a.user_B_fk = u.user_pk " +
@@ -203,7 +202,7 @@ public class Alert {
 
                 while (rs.next()) {
                     System.out.printf("%-10d %-20s %-15s %-10s %-20s\n",
-                            rs.getInt("alert_id"),
+                            rs.getInt("alert_pk"),
                             rs.getString("item_name"),
                             rs.getString("borrower_name"),
                             rs.getString("status"),
@@ -214,7 +213,7 @@ public class Alert {
     }
 
     private boolean updateAlertStatus(int alertId, String newStatus) throws SQLException {
-        String query = "UPDATE Alerts SET status = ? WHERE alert_id = ?";
+        String query = "UPDATE Alerts SET status = ? WHERE alert_pk = ?"; // 수정된 부분
 
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, newStatus);
@@ -248,3 +247,4 @@ public class Alert {
         }
     }
 }
+
